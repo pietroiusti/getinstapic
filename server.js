@@ -102,10 +102,14 @@ function getPage (url, handle) {
 	});
 	res.on('end', () => {
 	    try {
-		console.log(rawData);
+		//console.log(rawData);
+		let regex = /og:image.+.jpg/.exec(rawData);
+		regex = /http.+jpg/.exec(regex);
+		console.log(regex[0]);
+
 		handle.statusCode = 200;
 		handle.setHeader('Content-type', 'text/plain');
-		handle.end(rawData);
+		handle.end(regex[0]);
 	    } catch (e) {
 		console.error(e.message);
 	    }
