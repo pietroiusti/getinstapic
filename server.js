@@ -106,10 +106,14 @@ function getPage (url, handle) {
 		let regex = /og:image.+.jpg/.exec(rawData);
 		regex = /http.+jpg/.exec(regex);
 		console.log(regex[0]);
-
+		
 		handle.statusCode = 200;
-		handle.setHeader('Content-type', 'text/plain');
-		handle.end(regex[0]);
+		handle.setHeader('Content-type', 'text/html');
+
+		handle.write('Downlad your picture ');
+		let link = '<a href="' + regex + '">here</a>';
+		handle.end(link);
+
 	    } catch (e) {
 		console.error(e.message);
 	    }
