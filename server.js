@@ -112,7 +112,7 @@ function getPage (url, handle) {
 
 		let link = '<a href="' + regex + '">here</a>';
 
-		handle.end('Download your picture ' + link);
+		handle.end('<html><body>Download your picture ' + link + '</body></html>');
 
 	    } catch (e) {
 		console.error(e.message);
