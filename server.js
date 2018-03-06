@@ -102,17 +102,17 @@ function getPage (url, handle) {
 	});
 	res.on('end', () => {
 	    try {
-		//console.log(rawData);
+		// console.log(rawData);
 		let regex = /og:image.+.jpg/.exec(rawData);
 		regex = /http.+jpg/.exec(regex);
-		console.log(regex[0]);
+		// console.log(regex[0]);
 		
 		handle.statusCode = 200;
 		handle.setHeader('Content-type', 'text/html');
 
-		handle.write('Downlad your picture ');
 		let link = '<a href="' + regex + '">here</a>';
-		handle.end(link);
+
+		handle.end('Download your picture ' + link);
 
 	    } catch (e) {
 		console.error(e.message);
