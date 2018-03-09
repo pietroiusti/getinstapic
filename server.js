@@ -2,116 +2,117 @@
 const http = require('http');
 const https = require('https');
 const fs = require('fs');
+const publicIp = require('public-ip');
 const mongodb = require('mongodb');
 
 const port = process.env.PORT || 3000;
 
-// Connect to mongo db
-mongodb.MongoClient.connect(process.env.DBURI, (err, client) => {
-    if (err) {
-	console.log(err);
-    }
-
-    var collection = client.db('getinstapicdb').collection('usersRequests');
-
-    const server = http.createServer((req, res) => {
-	// Add error listener
-	req.on('error', (err) => {
+publicIp.v4().then(ip => {
+    // Connect to mongo db
+    mongodb.MongoClient.connect(process.env.DBURI, (err, client) => {
+	if (err) {
 	    console.log(err);
-	    res.statusCode = 400;
-	    res.end();
-	});
+	}
 
-	if (req.method === 'GET') {
-	    if (req.url === '/') {
-		fs.readFile('./public/homepage.html', (err, fileContent) => {
-		    if (err) {
-			console.log('Error 1');
-		    } else {
-			res.writeHead(200, {'Content-Type': 'text/html'});
-			res.end(fileContent);
-		    }
-		});
-	    } else if (req.url === '/public/css/styles.css') {
-		fs.readFile('./public/css/styles.css', (err, fileContent) => {
-		    if (err) {
-			console.log('Error 2');
-		    } else {
-			res.writeHead(200, {'Content-Type': 'text/css'});
-			res.end(fileContent);
-		    }
-		});
-	    }else if (req.url === '/public/scripts/loadingGif.js') {
-		fs.readFile('./public/scripts/loadingGif.js', (err, fileContent) => {
-		    if (err) {
-			console.log('Error 3');
-		    } else {
-			res.writeHead(200, {'Content-Type': 'text/javascript'});
-			res.end(fileContent);
-		    }
-		});
-	    } else if (req.url === '/public/images/lg.ajax-spinner-preloader.gif') {
-		fs.readFile('./public/images/lg.ajax-spinner-preloader.gif', (err, fileContent) => {
-		    if (err) {
-			console.log('Error 4');
-		    } else {
-			res.writeHead(200, {'Content-Type': 'image/jpg'});
-			res.end(fileContent);
-		    }
-		});	
-	    } else {
-		var splittedUrl = req.url.split('/');
-		if (splittedUrl[1] === 'getpic') {
-		    
-		    // leave only link part in the array
-		    splittedUrl.splice(0,2);
-		    
-		    // join with '/'
-		    let link = splittedUrl.join('/');
-		    // remove '?link=' from the beginning of string
-		    link = decodeURIComponent(link.slice(6, link.length));
+	var collection = client.db('getinstapicdb').collection('usersRequests');
 
-		    getPage(link, res);
+	const server = http.createServer((req, res) => {
+	    // Add error listener
+	    req.on('error', (err) => {
+		console.log(err);
+		res.statusCode = 400;
+		res.end();
+	    });
 
-		    // Insert user request into db
-		    let userReq = {
-		    	ip: req.connection.remoteAddress,
-		    	requested: link,
-			date: new Date//("<YYYY-mm-ddTHH:MM:ss>")
-		    };
-		    collection.insertOne(userReq, function(err, result) {
+	    if (req.method === 'GET') {
+		if (req.url === '/') {
+		    fs.readFile('./public/homepage.html', (err, fileContent) => {
 			if (err) {
-			    console.log(err);
+			    console.log('Error 1');
 			} else {
-			    console.log('Request stored in db');
+			    res.writeHead(200, {'Content-Type': 'text/html'});
+			    res.end(fileContent);
 			}
 		    });
+		} else if (req.url === '/public/css/styles.css') {
+		    fs.readFile('./public/css/styles.css', (err, fileContent) => {
+			if (err) {
+			    console.log('Error 2');
+			} else {
+			    res.writeHead(200, {'Content-Type': 'text/css'});
+			    res.end(fileContent);
+			}
+		    });
+		}else if (req.url === '/public/scripts/loadingGif.js') {
+		    fs.readFile('./public/scripts/loadingGif.js', (err, fileContent) => {
+			if (err) {
+			    console.log('Error 3');
+			} else {
+			    res.writeHead(200, {'Content-Type': 'text/javascript'});
+			    res.end(fileContent);
+			}
+		    });
+		} else if (req.url === '/public/images/lg.ajax-spinner-preloader.gif') {
+		    fs.readFile('./public/images/lg.ajax-spinner-preloader.gif', (err, fileContent) => {
+			if (err) {
+			    console.log('Error 4');
+			} else {
+			    res.writeHead(200, {'Content-Type': 'image/jpg'});
+			    res.end(fileContent);
+			}
+		    });	
+		} else {
+		    var splittedUrl = req.url.split('/');
+		    if (splittedUrl[1] === 'getpic') {
+			
+			// leave only link part in the array
+			splittedUrl.splice(0,2);
+			
+			// join with '/'
+			let link = splittedUrl.join('/');
+			// remove '?link=' from the beginning of string
+			link = decodeURIComponent(link.slice(6, link.length));
+
+			getPage(link, res);
+
+			// Insert user request into db
+			let userReq = {
+		    	    ip: ip,
+		    	    requested: link,
+			    date: new Date().toLocaleString()
+			};
+			collection.insertOne(userReq, function(err, result) {
+			    if (err) {
+				console.log(err);
+			    } else {
+				console.log('Request stored in db');
+			    }
+			});
+		    } else {
+			res.statusCode = 404;
+			res.end('error');
+		    }
+		}
+	    } else if (req.method === 'POST') {
+		if (req.url === '/getpic/') {
+		    console.log('Got post request at /getpic/');
+		    console.log(req); // Where is the body??
+		    //getPage('https://www.google.com', res);
 		} else {
 		    res.statusCode = 404;
 		    res.end('error');
 		}
-	    }
-	} else if (req.method === 'POST') {
-	    if (req.url === '/getpic/') {
-		console.log('Got post request at /getpic/');
-		console.log(req); // Where is the body??
-		//getPage('https://www.google.com', res);
 	    } else {
 		res.statusCode = 404;
 		res.end('error');
 	    }
-	} else {
-	    res.statusCode = 404;
-	    res.end('error');
-	}
-    });
-    
-    server.listen(port, () => {
-	console.log(`Server running at port ${port}`);
+	});
+	
+	server.listen(port, () => {
+	    console.log(`Server running at port ${port}`);
+	});
     });
 });
-
-
 
 // Get an url and an http server response object.
 // End the server response with the content retrieved from the url.
