@@ -64,30 +64,35 @@ publicIp.v4().then(ip => {
 		} else {
 		    var splittedUrl = req.url.split('/');
 		    if (splittedUrl[1] === 'getpic') {
-			
-			// leave only link part in the array
+			// Leave only link part in the array
 			splittedUrl.splice(0,2);
-			
-			// join with '/'
+			// Join with '/'
 			let link = splittedUrl.join('/');
 			// remove '?link=' from the beginning of string
 			link = decodeURIComponent(link.slice(6, link.length));
 
-			getPage(link, res);
-
-			// Insert user request into db
-			let userReq = {
-		    	    ip: ip,
-		    	    requested: link,
-			    date: new Date().toLocaleString()
-			};
-			collection.insertOne(userReq, function(err, result) {
-			    if (err) {
-				console.log(err);
-			    } else {
-				console.log('Request stored in db');
-			    }
-			});
+			// Check link
+			let rightPrefix = "https://www.instagram.com/";
+			let actualPrefix = link.slice(0,26);
+			if (actualPrefix === rightPrefix) {
+			    getPhoto(link, res);
+			    // Insert user request into db
+			    let userReq = {
+		    		ip: ip,
+		    		requested: link,
+				date: new Date().toLocaleString()
+			    };
+			    collection.insertOne(userReq, function(err, result) {
+				if (err) {
+				    console.log(err);
+				} else {
+				    console.log('Request stored in db');
+				}
+			    });
+			} else {
+			    res.statusCode = 404;
+			    res.end('Wrong link');			    
+			}
 		    } else {
 			res.statusCode = 404;
 			res.end('error');
@@ -97,7 +102,7 @@ publicIp.v4().then(ip => {
 		if (req.url === '/getpic/') {
 		    console.log('Got post request at /getpic/');
 		    console.log(req); // Where is the body??
-		    //getPage('https://www.google.com', res);
+		    //getPhoto('https://www.google.com', res);
 		} else {
 		    res.statusCode = 404;
 		    res.end('error');
@@ -116,7 +121,7 @@ publicIp.v4().then(ip => {
 
 // Get an url and an http server response object.
 // End the server response with the content retrieved from the url.
-function getPage (url, handle) {
+function getPhoto (url, handle) {
     https.get(url, (res) => {
 	const { statusCode } = res;
 	const contentType = res.headers['content-type'];
