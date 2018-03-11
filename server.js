@@ -75,6 +75,7 @@ publicIp.v4().then(ip => {
 			let rightPrefix = "https://www.instagram.com/";
 			let actualPrefix = link.slice(0,26);
 			if (actualPrefix === rightPrefix) {
+			    // Find photo from link given 
 			    getPhoto(link, res);
 			    // Insert user request into db
 			    let userReq = {
@@ -137,18 +138,10 @@ function getPhoto (url, handle) {
 	});
 	res.on('end', () => {
 	    try {
-		// console.log(rawData);
-		let regex = /og:image.+.jpg/.exec(rawData);
-		regex = /http.+jpg/.exec(regex);
-		// console.log(regex[0]);
-		
+		let link = getPhotoUrl(rawData);
 		handle.statusCode = 200;
 		handle.setHeader('Content-type', 'text/html');
-
-		let link = '<a href="' + regex + '">here</a>';
-
-		handle.end('<html><body>Download your picture ' + link + '</body></html>');
-
+		handle.end('<!DOCTYPE html><html><body>Download your picture ' + link + '</body></html>');
 	    } catch (e) {
 		console.error(e.message);
 	    }
@@ -156,4 +149,11 @@ function getPhoto (url, handle) {
     }).on('error', (e) => {
 	console.error(`Got error: ${e.message}`);
     });
+};
+
+// Get html page and find right url
+function getPhotoUrl (page) {
+    let regex = /og:image.+.jpg/.exec(page);
+    regex = /http.+jpg/.exec(regex);
+    return '<a href="' + regex + '">here</a>';    
 };
