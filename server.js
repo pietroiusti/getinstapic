@@ -72,9 +72,7 @@ publicIp.v4().then(ip => {
 			link = decodeURIComponent(link.slice(6, link.length));
 
 			// Check link
-			let rightPrefix = "https://www.instagram.com/";
-			let actualPrefix = link.slice(0,26);
-			if (actualPrefix === rightPrefix) {
+			if (isInputLegal(link)) {
 			    // Find photo from link given 
 			    getPhoto(link, res);
 			    // Insert user request into db
@@ -156,4 +154,16 @@ function getPhotoUrl (page) {
     let regex = /og:image.+.jpg/.exec(page);
     regex = /http.+jpg/.exec(regex);
     return '<a href="' + regex + '">here</a>';    
+};
+
+
+// Check whether the input from the user is the right king of url
+function isInputLegal(input) {
+    let rightPrefix = "https://www.instagram.com/";
+    let actualPrefix = input.slice(0,26);
+    if (actualPrefix === rightPrefix) {
+	return true;
+    } else {
+	return false;
+    }
 };
