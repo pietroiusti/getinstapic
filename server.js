@@ -67,27 +67,14 @@ publicIp.v4().then(ip => {
 			// Leave only link part in the array
 			splittedUrl.splice(0,2);
 			// Join with '/'
-			let link = splittedUrl.join('/');
+			let userInput = splittedUrl.join('/');
 			// remove '?link=' from the beginning of string
-			link = decodeURIComponent(link.slice(6, link.length));
+			userInput = decodeURIComponent(userInput.slice(6, userInput.length));
 
 			// Check link
-			if (isInputLegal(link)) {
+			if (isInputLegal(userInput)) {
 			    // Find photo from link given 
-			    getPhoto(link, res);
-			    // Insert user request into db
-			    let userReq = {
-		    		ip: ip,
-		    		requested: link,
-				date: new Date().toLocaleString()
-			    };
-			    collection.insertOne(userReq, function(err, result) {
-				if (err) {
-				    console.log(err);
-				} else {
-				    console.log('Request stored in db');
-				}
-			    });
+			    getPhoto(userInput, res, ip, collection);
 			} else {
 			    res.statusCode = 404;
 			    res.end('Wrong link');			    
@@ -120,7 +107,7 @@ publicIp.v4().then(ip => {
 
 // Get an url and an http server response object.
 // End the server response with the content retrieved from the url.
-function getPhoto (url, handle) {
+function getPhoto (url, handle, ip, dbCollection) {
     https.get(url, (res) => {
 	const { statusCode } = res;
 	const contentType = res.headers['content-type'];
@@ -136,10 +123,27 @@ function getPhoto (url, handle) {
 	});
 	res.on('end', () => {
 	    try {
-		let link = getPhotoUrl(rawData);
+		let originalPhoto = getPhotoUrl(rawData);
 		handle.statusCode = 200;
 		handle.setHeader('Content-type', 'text/html');
-		handle.end('<!DOCTYPE html><html><body>Download your picture ' + link + '</body></html>');
+		handle.end('<!DOCTYPE html><html><body>Download your picture ' + '<a href="' + originalPhoto + '">here</a>' + '</body></html>');
+
+		// Insert user request into db
+		let userReq = {
+		    ip: ip,
+		    requested: url,
+		    found: originalPhoto,
+		    date: new Date().toLocaleString()
+		};
+		dbCollection.insertOne(userReq, function(err, result) {
+		    if (err) {
+			console.log(err);
+		    } else {
+			console.log('Request stored in db');
+		    }
+		});
+
+		
 	    } catch (e) {
 		console.error(e.message);
 	    }
@@ -153,9 +157,8 @@ function getPhoto (url, handle) {
 function getPhotoUrl (page) {
     let regex = /og:image.+.jpg/.exec(page);
     regex = /http.+jpg/.exec(regex);
-    return '<a href="' + regex + '">here</a>';    
+    return regex[0];
 };
-
 
 // Check whether the input from the user is the right king of url
 function isInputLegal(input) {
@@ -167,3 +170,4 @@ function isInputLegal(input) {
 	return false;
     }
 };
+
