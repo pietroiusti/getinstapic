@@ -74,7 +74,7 @@ publicIp.v4().then(ip => {
 			// Check link
 			if (isInputLegal(userInput)) {
 			    // Find photo from link given 
-			    getPhoto(userInput, res, ip, collection);
+			    getPhoto(userInput, res, ip, collection, storeRequestInDb);
 			} else {
 			    res.statusCode = 404;
 			    res.end('Wrong link');			    
@@ -105,9 +105,10 @@ publicIp.v4().then(ip => {
     });
 });
 
-// Get an url and an http server response object.
+// Get an url and an http server response object, the user ip, a db collection, and
+// a callback to insert the request in the db collection.
 // End the server response with the content retrieved from the url.
-function getPhoto (url, handle, ip, dbCollection) {
+function getPhoto (url, handle, ip, dbCollection, callback) {
     https.get(url, (res) => {
 	const { statusCode } = res;
 	const contentType = res.headers['content-type'];
@@ -129,20 +130,12 @@ function getPhoto (url, handle, ip, dbCollection) {
 		handle.end('<!DOCTYPE html><html><body>Download your picture ' + '<a href="' + originalPhoto + '">here</a>' + '</body></html>');
 
 		// Insert user request into db
-		let userReq = {
+		callback({
 		    ip: ip,
 		    requested: url,
 		    found: originalPhoto,
 		    date: new Date().toLocaleString()
-		};
-		dbCollection.insertOne(userReq, function(err, result) {
-		    if (err) {
-			console.log(err);
-		    } else {
-			console.log('Request stored in db');
-		    }
-		});
-
+		}, dbCollection);
 		
 	    } catch (e) {
 		console.error(e.message);
@@ -152,6 +145,16 @@ function getPhoto (url, handle, ip, dbCollection) {
 	console.error(`Got error: ${e.message}`);
     });
 };
+
+function storeRequestInDb(doc, collection) {
+    collection.insertOne(doc, function(err, result) {
+	if (err) {
+	    console.log(err);
+	} else {
+	    console.log('Request stored in db');
+	}
+    });
+}
 
 // Get html page and find right url
 function getPhotoUrl (page) {
