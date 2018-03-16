@@ -26,6 +26,7 @@ publicIp.v4().then(ip => {
 
 	    if (req.method === 'GET') {
 		if (req.url === '/') {
+		    // Serve homepage
 		    fs.readFile('./public/homepage.html', (err, fileContent) => {
 			if (err) {
 			    console.log('Error 1');
@@ -64,17 +65,10 @@ publicIp.v4().then(ip => {
 		} else {
 		    var splittedUrl = req.url.split('/');
 		    if (splittedUrl[1] === 'getpic') {
-			// Leave only link part in the array
-			splittedUrl.splice(0,2);
-			// Join with '/'
-			let userInput = splittedUrl.join('/');
-			// remove '?link=' from the beginning of string
-			userInput = decodeURIComponent(userInput.slice(6, userInput.length));
-
-			// Check link
-			if (isInputLegal(userInput)) {
-			    // Find photo from link given 
-			    getPhoto(userInput, res, ip, collection, storeRequestInDb);
+			// Check user input
+			if (isInputLegal(getUserInput(req.url))) {
+			    // Find photo from link given, give it to user and store request in db.
+			    getPhoto(getUserInput(req.url), res, ip, collection, storeRequestInDb);
 			} else {
 			    res.statusCode = 404;
 			    res.end('Wrong link');			    
@@ -156,12 +150,25 @@ function storeRequestInDb(doc, collection) {
     });
 }
 
-// Get html page and find right url
+// Find url photo within the html/js code of the page.
 function getPhotoUrl (page) {
     let regex = /og:image.+.jpg/.exec(page);
     regex = /http.+jpg/.exec(regex);
     return regex[0];
 };
+
+// Return user input from url of get request
+function getUserInput(url) {
+    // split url using '/'
+    var splittedUrl = url.split('/');
+    // Leave only link part in the array
+    splittedUrl.splice(0,2);
+    // Join with '/'
+    var userInput = splittedUrl.join('/');
+    // remove '?link=' from the beginning of string
+    userInput = decodeURIComponent(userInput.slice(6, userInput.length));
+    return userInput;
+}
 
 // Check whether the input from the user is the right king of url
 function isInputLegal(input) {
@@ -173,4 +180,3 @@ function isInputLegal(input) {
 	return false;
     }
 };
-
