@@ -21,7 +21,6 @@
    },
    "homepage": "https://github.com/glptrst/getinstapic#readme",
    "dependencies": {
-      "mongodb": "^3.0.4",
-      "public-ip": "^2.4.0"
+      "mongodb": "^3.0.4"
    }
 }
