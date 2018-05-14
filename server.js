@@ -68,7 +68,14 @@ mongodb.MongoClient.connect(process.env.DBURI, (err, client) => {
 		    // Check user input
 		    if (instapic.isInputLegal(instapic.getUserInput(req.url))) {
 			// Find photo from link given, give it to user and store request in db.
-			instapic.getPhoto(instapic.getUserInput(req.url), res, collection, instapic.storeRequestInDb);
+			//instapic.getPhoto(instapic.getUserInput(req.url), res, collection, instapic.storeRequestInDb);
+			let pagePromise = instapic.getPhoto2(instapic.getUserInput(req.url));
+			pagePromise.
+			    then((page) => {
+				console.log(page);
+			    }, (err) => {
+				console.log(err);
+			    });
 		    } else {
 			res.statusCode = 404;
 			res.end('Wrong link');			    

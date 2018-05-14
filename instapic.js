@@ -1,7 +1,7 @@
 const https = require('https');
 
 module.exports = {
-    getPhoto: getPhoto,
+    getPhoto2: getPhoto2,
     storeRequestInDb: storeRequestInDb,
     getPhotoUrl: getPhotoUrl,
     getUserInput: getUserInput,
@@ -11,7 +11,7 @@ module.exports = {
 // Get an url and an http server response object, a db collection, and
 // a callback to insert the request in the db collection.
 // End the server response with the content retrieved from the url.
-function getPhoto (url, handle, dbCollection, callback) {
+function getPhoto1 (url, handle, dbCollection, callback) {
     https.get(url, (res) => {
 	const { statusCode } = res;
 	const contentType = res.headers['content-type'];
@@ -47,6 +47,34 @@ function getPhoto (url, handle, dbCollection, callback) {
 	console.error(`Got error: ${e.message}`);
     });
 };
+// return a promise to page 
+function getPhoto2 (url) {
+    return new Promise( (resolve, reject) => {
+	https.get(url, (res) => {
+	    const { statusCode } = res;
+	    const contentType = res.headers['content-type'];
+	    let error;
+	    if (statusCode !== 200) {
+		error = new Error('Request Failed.\n' +
+				  `Status Code: ${statusCode}`);
+	    }
+	    let rawData = '';
+	    res.on('data', (chunk) => {
+		rawData += chunk;
+	    });
+	    res.on('end', () => {
+		try {
+		    resolve(rawData);
+		} catch (e) {
+		    reject(e);
+		}
+	    });
+	}).on('error', (e) => {
+	    reject(e);
+	});
+    });
+};
+
 
 function storeRequestInDb(doc, collection) {
     collection.insertOne(doc, function(err, result) {
@@ -78,7 +106,7 @@ function getUserInput(url) {
     return userInput;
 }
 
-// Check whether the input from the user is the right king of url
+// Check whether the input from the user is the right kind of url
 function isInputLegal(input) {
     let rightPrefix = "https://www.instagram.com/";
     let actualPrefix = input.slice(0,26);
