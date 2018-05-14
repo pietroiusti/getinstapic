@@ -67,12 +67,24 @@ mongodb.MongoClient.connect(process.env.DBURI, (err, client) => {
 		if (splittedUrl[1] === 'getpic') {
 		    // Check user input
 		    if (instapic.isInputLegal(instapic.getUserInput(req.url))) {
-			// Find photo from link given, give it to user and store request in db.
-			//instapic.getPhoto(instapic.getUserInput(req.url), res, collection, instapic.storeRequestInDb);
-			let pagePromise = instapic.getPhoto2(instapic.getUserInput(req.url));
+			// get promise to html of the page
+			let pagePromise = instapic.getPhoto(instapic.getUserInput(req.url));
 			pagePromise.
 			    then((page) => {
-				console.log(page);
+				// get link of the photo
+				let originalPhoto = instapic.getPhotoUrl(page);
+
+				// send response to user
+				res.statusCode = 200;
+				res.setHeader('Content-type', 'text/html');
+				res.end('<!DOCTYPE html><html><body>Download your picture ' + '<a href="' + originalPhoto + '">here</a>' + '</body></html>');
+
+				// Insert user request into db
+				instapic.storeRequestInDb({
+				    requested: instapic.getUserInput(req.url),
+				    found: originalPhoto,
+				    date: new Date().toLocaleString()
+				}, collection);
 			    }, (err) => {
 				console.log(err);
 			    });

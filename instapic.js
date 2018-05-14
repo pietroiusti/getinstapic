@@ -1,54 +1,15 @@
 const https = require('https');
 
 module.exports = {
-    getPhoto2: getPhoto2,
+    getPhoto: getPhoto,
     storeRequestInDb: storeRequestInDb,
     getPhotoUrl: getPhotoUrl,
     getUserInput: getUserInput,
     isInputLegal: isInputLegal
 };
 
-// Get an url and an http server response object, a db collection, and
-// a callback to insert the request in the db collection.
-// End the server response with the content retrieved from the url.
-function getPhoto1 (url, handle, dbCollection, callback) {
-    https.get(url, (res) => {
-	const { statusCode } = res;
-	const contentType = res.headers['content-type'];
-
-	let error;
-	if (statusCode !== 200) {
-	    error = new Error('Request Failed.\n' +
-			      `Status Code: ${statusCode}`);
-	}
-	let rawData = '';
-	res.on('data', (chunk) => {
-	    rawData += chunk;
-	});
-	res.on('end', () => {
-	    try {
-		let originalPhoto = getPhotoUrl(rawData);
-		handle.statusCode = 200;
-		handle.setHeader('Content-type', 'text/html');
-		handle.end('<!DOCTYPE html><html><body>Download your picture ' + '<a href="' + originalPhoto + '">here</a>' + '</body></html>');
-
-		// Insert user request into db
-		callback({
-		    requested: url,
-		    found: originalPhoto,
-		    date: new Date().toLocaleString()
-		}, dbCollection);
-		
-	    } catch (e) {
-		console.error(e.message);
-	    }
-	});
-    }).on('error', (e) => {
-	console.error(`Got error: ${e.message}`);
-    });
-};
 // return a promise to page 
-function getPhoto2 (url) {
+function getPhoto (url) {
     return new Promise( (resolve, reject) => {
 	https.get(url, (res) => {
 	    const { statusCode } = res;
