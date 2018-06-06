@@ -2,7 +2,6 @@ const https = require('https');
 
 module.exports = {
     getPhoto: getPhoto,
-    storeRequestInDb: storeRequestInDb,
     getPhotoUrl: getPhotoUrl,
     getUserInput: getUserInput,
     isInputLegal: isInputLegal
@@ -35,17 +34,6 @@ function getPhoto (url) {
 	});
     });
 };
-
-
-function storeRequestInDb(doc, collection) {
-    collection.insertOne(doc, function(err, result) {
-	if (err) {
-	    console.log(err);
-	} else {
-	    console.log('Request stored in db');
-	}
-    });
-}
 
 // Find url photo within the html/js code of the page.
 function getPhotoUrl (page) {

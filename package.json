@@ -20,7 +20,4 @@
       "url": "https://github.com/glptrst/getinstapic/issues"
    },
    "homepage": "https://github.com/glptrst/getinstapic#readme",
-   "dependencies": {
-      "mongodb": "^3.0.4"
-   }
 }
