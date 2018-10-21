@@ -1,14 +1,14 @@
 const https = require('https');
 
 module.exports = {
-    getPhoto: getPhoto,
+    getPage: getPage,
     getPhotoUrl: getPhotoUrl,
     getUserInput: getUserInput,
     isInputLegal: isInputLegal
 };
 
 // return a promise to page 
-function getPhoto (url) {
+function getPage (url) {
     return new Promise( (resolve, reject) => {
 	https.get(url, (res) => {
 	    const { statusCode } = res;

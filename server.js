@@ -58,7 +58,7 @@ const server = http.createServer((req, res) => {
 		// Check user input
 		if (instapic.isInputLegal(instapic.getUserInput(req.url))) {
 		    // get promise to html of the page
-		    let pagePromise = instapic.getPhoto(instapic.getUserInput(req.url));
+		    let pagePromise = instapic.getPage(instapic.getUserInput(req.url));
 		    pagePromise.
 			then((page) => {
 			    // get photo's url
