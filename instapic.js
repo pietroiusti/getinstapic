@@ -37,9 +37,10 @@ function getPage (url) {
 
 // Find url photo within the html/js code of the page.
 function getPhotoUrl (page) {
-    let regex = /og:image.+.jpg/.exec(page);
-    regex = /http.+jpg/.exec(regex);
-    return regex[0];
+    let regex = /"og:image.+content=".+"/.exec(page);
+    regex = /http.+\"/.exec(regex);
+
+    return regex[0].substring(0, regex[0].length-1);
 };
 
 // Return user input from url of get request

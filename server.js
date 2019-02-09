@@ -61,11 +61,11 @@ const server = http.createServer((req, res) => {
 		    let pagePromise = instapic.getPage(instapic.getUserInput(req.url));
 		    pagePromise.
 			then((page) => {
-			    // get photo's url
-			    let originalPhoto = instapic.getPhotoUrl(page);
-			    // redirect to photo
+			    // get picture's url
+			    let picture = instapic.getPhotoUrl(page);
+			    // redirect to picture
 			    res.statusCode = 302;
-			    res.setHeader('Location', originalPhoto);
+			    res.setHeader('Location', picture);
 			    res.end();
 			}, (err) => {
 			    console.log(err);
