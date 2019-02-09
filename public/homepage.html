@@ -1,26 +1,25 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <script src="/public/scripts/loadingGif.js"></script>
-    <link rel="stylesheet" href="/public/css/styles.css">
+
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="/public/css/floating-labels.css">
 
     <title>Get Insta Pic</title>
   </head>
 
   <body>
-    <form action="/getpic/" method="get">
+    <form id="form" class="form-signin" action="/getpic/" method="get">
       <div>
 	<!-- <label for="to">Link</label> -->
-	<input type="text" name="link" placeholder="link" autofocus>
+	<input class="form-control" type="text" name="link" placeholder="link" autofocus>
       </div>
       <div>
-	<span id="inputSpan"><input id="prova" type="submit" value="Get Picture"></span>
+	<button id="inputSpan" class="btn btn-lg btn-primary btn-block" type="submit">Get Picture</button>
+	<!-- <span id="inputSpan"><input id="prova" type="submit" --
+					 -- value="Get Picture"></span> -->
       </div>
     </form>
-
-    <div id="loadingGif">
-      
-    </div>
   </body>
-
 </html>

@@ -25,8 +25,8 @@ const server = http.createServer((req, res) => {
 		    res.end(fileContent);
 		}
 	    });
-	} else if (req.url === '/public/css/styles.css') {
-	    fs.readFile('./public/css/styles.css', (err, fileContent) => {
+	} else if (req.url === '/public/css/floating-labels.css') {
+	    fs.readFile('./public/css/floating-labels.css', (err, fileContent) => {
 		if (err) {
 		    console.log('Error 2');
 		} else {
