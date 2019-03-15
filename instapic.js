@@ -2,12 +2,13 @@ const https = require('https');
 
 module.exports = {
     getPage: getPage,
+    redirectUserToPic: redirectUserToPic,
     getPhotoUrl: getPhotoUrl,
     getUserInput: getUserInput,
     isInputLegal: isInputLegal
 };
 
-// return a promise to page 
+// return a promise to page
 function getPage (url) {
     return new Promise( (resolve, reject) => {
 	https.get(url, (res) => {
@@ -34,6 +35,20 @@ function getPage (url) {
 	});
     });
 };
+
+// Redirect user to picture url; take page url and a response object
+async function redirectUserToPic(pageUrl, res) {
+    try {
+	let page = await getPage(getUserInput(pageUrl));
+	let picture = getPhotoUrl(page);
+	// redirect to picture
+	res.statusCode = 302;
+	res.setHeader('Location', picture);
+	res.end();
+    } catch(e) {
+	console.log(e);
+    }
+}
 
 // Find url photo within the html/js code of the page.
 function getPhotoUrl (page) {

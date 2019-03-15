@@ -57,19 +57,8 @@ const server = http.createServer((req, res) => {
 	    if (splittedUrl[1] === 'getpic') {
 		// Check user input
 		if (instapic.isInputLegal(instapic.getUserInput(req.url))) {
-		    // get promise to html of the page
-		    let pagePromise = instapic.getPage(instapic.getUserInput(req.url));
-		    pagePromise.
-			then((page) => {
-			    // get picture's url
-			    let picture = instapic.getPhotoUrl(page);
-			    // redirect to picture
-			    res.statusCode = 302;
-			    res.setHeader('Location', picture);
-			    res.end();
-			}, (err) => {
-			    console.log(err);
-			});
+		    // Redirect user to picture
+		    instapic.redirectUserToPic(req.url, res);
 		} else {
 		    res.statusCode = 404;
 		    res.end('Wrong link');			    
