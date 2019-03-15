@@ -16,7 +16,6 @@ const server = http.createServer((req, res) => {
 
     if (req.method === 'GET') {
 	if (req.url === '/') {
-	    // Serve homepage
 	    fs.readFile('./public/homepage.html', (err, fileContent) => {
 		if (err) {
 		    console.log('Error 1');
@@ -34,24 +33,6 @@ const server = http.createServer((req, res) => {
 		    res.end(fileContent);
 		}
 	    });
-	} else if (req.url === '/public/scripts/loadingGif.js') {
-	    fs.readFile('./public/scripts/loadingGif.js', (err, fileContent) => {
-		if (err) {
-		    console.log('Error 3');
-		} else {
-		    res.writeHead(200, {'Content-Type': 'text/javascript'});
-		    res.end(fileContent);
-		}
-	    });
-	} else if (req.url === '/public/images/lg.ajax-spinner-preloader.gif') {
-	    fs.readFile('./public/images/lg.ajax-spinner-preloader.gif', (err, fileContent) => {
-		if (err) {
-		    console.log('Error 4');
-		} else {
-		    res.writeHead(200, {'Content-Type': 'image/jpg'});
-		    res.end(fileContent);
-		}
-	    });	
 	} else {
 	    var splittedUrl = req.url.split('/');
 	    if (splittedUrl[1] === 'getpic') {
