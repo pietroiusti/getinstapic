@@ -14,7 +14,8 @@ const server = http.createServer((req, res) => {
   });
 
   if (req.method === 'GET') {
-    if (req.url === '/') {
+    switch (req.url) {
+    case '/': {
       fs.readFile('./public/homepage.html', (err, fileContent) => {
 	if (err) {
 	  console.log('Error 1');
@@ -23,7 +24,9 @@ const server = http.createServer((req, res) => {
 	  res.end(fileContent);
 	}
       });
-    } else if (req.url === '/cover.css') {
+      break;
+    }
+    case '/cover.css': {
       fs.readFile('./public/css/cover.css', (err, fileContent) => {
 	if (err) {
 	  console.log('Error 2');
@@ -32,7 +35,9 @@ const server = http.createServer((req, res) => {
 	  res.end(fileContent);
 	}
       });
-    } else {
+      break;
+    }
+    default: {
       var splittedUrl = req.url.split('/');
       if (splittedUrl[1] === 'getpic') {
 	// Check user input
@@ -40,7 +45,16 @@ const server = http.createServer((req, res) => {
 	    ===
 	    "https://www.instagram.com/") {
 	  // Redirect user to picture
-	  redirectUserToPic(req.url, res);
+	  try {
+	    getPage(getUserInput(req.url)).then((page) => {
+	      res.statusCode = 302;
+	      res.setHeader('Location', getPhotoUrl(page));
+	      res.end();
+	    });
+	  } catch(e) {
+	    console.log(e);
+	    res.end(e);
+	  }
 	} else {
 	  res.statusCode = 404;
 	  res.end('Wrong link');			    
@@ -49,6 +63,7 @@ const server = http.createServer((req, res) => {
 	res.statusCode = 404;
 	res.end('error');
       }
+    }
     }
   } else {
     res.statusCode = 404;
@@ -87,20 +102,6 @@ function getPage (url) {
     });
   });
 };
-
-// Redirect user to picture url; take page url and a response object
-async function redirectUserToPic(pageUrl, res) {
-  try {
-    let page = await getPage(getUserInput(pageUrl));
-    let picture = getPhotoUrl(page);
-    // redirect to picture
-    res.statusCode = 302;
-    res.setHeader('Location', picture);
-    res.end();
-  } catch(e) {
-    console.log(e);
-  }
-}
 
 // Find url photo within the html/js code of the page.
 function getPhotoUrl (page) {
