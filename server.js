@@ -45,16 +45,15 @@ const server = http.createServer((req, res) => {
 	    ===
 	    "https://www.instagram.com/") {
 	  // Redirect user to picture
-	  try {
-	    getPage(getUserInput(req.url)).then((page) => {
+	  getPage(getUserInput(req.url))
+	    .then((page) => {
 	      res.statusCode = 302;
 	      res.setHeader('Location', getPhotoUrl(page));
 	      res.end();
+	    }).catch((e) => {
+	      console.log(e);
+	      res.end(e);
 	    });
-	  } catch(e) {
-	    console.log(e);
-	    res.end(e);
-	  }
 	} else {
 	  res.statusCode = 404;
 	  res.end('Wrong link');			    
