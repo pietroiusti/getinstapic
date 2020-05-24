@@ -41,19 +41,27 @@ const server = http.createServer((req, res) => {
 	if (getUserInput(req.url).slice(0, 26)
 	    ===
 	    "https://www.instagram.com/") {
-	  // get promise to html of the page
-	  let pagePromise = getPage(getUserInput(req.url));
-	  pagePromise.
-	    then((page) => {
-	      // get photo's url
-	      let originalPhoto = getPhotoUrl(page);
-	      // redirect to photo
-	      res.statusCode = 302;
-	      res.setHeader('Location', originalPhoto);
-	      res.end();
-	    }, (err) => {
-	      console.log(err);
+	  //get promise to html of the page
+	  https.get(getUserInput(req.url), (response) => {
+	    const { statusCode } = response;
+	    const contentType = response.headers['content-type'];
+	    let error;
+	    if (statusCode !== 200) {
+	      error = new Error('Request Failed.\n' +
+				`Status Code: ${statusCode}`);
+	    }
+	    let rawData = '';
+	    response.on('data', (chunk) => {
+	      rawData += chunk;
 	    });
+	    response.on('end', () => {
+	      let photoUrl = getPhotoUrl(rawData);
+	      //redirect to photo
+	      res.statusCode = 302;
+	      res.setHeader('Location', photoUrl);
+	      res.end();
+	    });
+	  });
 	} else {
 	  res.statusCode = 404;
 	  res.end('Wrong link');			    
