@@ -14,8 +14,9 @@ const server = http.createServer((req, res) => {
   });
 
   if (req.method === 'GET') {
-    switch (req.url) {
-    case '/': {
+    console.log(req.url);
+    if (req.url === '/') {
+      // Serve homepage
       fs.readFile('./public/homepage.html', (err, fileContent) => {
 	if (err) {
 	  console.log('Error 1');
@@ -24,9 +25,7 @@ const server = http.createServer((req, res) => {
 	  res.end(fileContent);
 	}
       });
-      break;
-    }
-    case '/cover.css': {
+    } else if (req.url === '/cover.css') {
       fs.readFile('./public/css/cover.css', (err, fileContent) => {
 	if (err) {
 	  console.log('Error 2');
@@ -35,24 +34,25 @@ const server = http.createServer((req, res) => {
 	  res.end(fileContent);
 	}
       });
-      break;
-    }
-    default: {
+    } else {
       var splittedUrl = req.url.split('/');
       if (splittedUrl[1] === 'getpic') {
 	// Check user input
 	if (getUserInput(req.url).slice(0, 26)
 	    ===
 	    "https://www.instagram.com/") {
-	  // Redirect user to picture
-	  getPage(getUserInput(req.url))
-	    .then((page) => {
+	  // get promise to html of the page
+	  let pagePromise = getPage(getUserInput(req.url));
+	  pagePromise.
+	    then((page) => {
+	      // get photo's url
+	      let originalPhoto = getPhotoUrl(page);
+	      // redirect to photo
 	      res.statusCode = 302;
-	      res.setHeader('Location', getPhotoUrl(page));
+	      res.setHeader('Location', originalPhoto);
 	      res.end();
-	    }).catch((e) => {
-	      console.log(e);
-	      res.end(e);
+	    }, (err) => {
+	      console.log(err);
 	    });
 	} else {
 	  res.statusCode = 404;
@@ -62,7 +62,6 @@ const server = http.createServer((req, res) => {
 	res.statusCode = 404;
 	res.end('error');
       }
-    }
     }
   } else {
     res.statusCode = 404;
