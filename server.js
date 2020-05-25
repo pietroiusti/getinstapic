@@ -45,6 +45,7 @@ const server = http.createServer((req, res) => {
 	  try {
 
 	    https.get(instapic.getUserInput(req.url), (response) => {
+	      console.log(response);
 	      const { statusCode } = response;
 	      const contentType = response.headers['content-type'];
 	      let error;
