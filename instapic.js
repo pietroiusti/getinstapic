@@ -40,7 +40,7 @@ function getPage (url) {
 async function redirectUserToPic(pageUrl, res) {
   try {
     let page = await getPage(getUserInput(pageUrl));
-    console.log(page);
+    console.log("PAGE: " + String(page));
     let picture = getPhotoUrl(page);
     // redirect to picture
     res.statusCode = 302;
