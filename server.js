@@ -38,8 +38,38 @@ const server = http.createServer((req, res) => {
       if (splittedUrl[1] === 'getpic') {
 	// Check user input
 	if (instapic.isInputLegal(instapic.getUserInput(req.url))) {
+
 	  // Redirect user to picture
-	  instapic.redirectUserToPic(req.url, res);
+	  //instapic.redirectUserToPic(req.url, res);
+
+	  try {
+
+	    https.get(instapic.getUserInput(req.url), (response) => {
+	      const { statusCode } = response;
+	      const contentType = response.headers['content-type'];
+	      let error;
+	      if (statusCode !== 200) {
+		error = new Error('Request Failed.\n' +
+				  `Status Code: ${statusCode}`);
+	      }
+	      let rawData = '';
+	      response.on('data', (chunk) => {
+		rawData += chunk;
+	      });
+	      response.on('end', () => {
+		let picture = instapic.getPhotoUrl(rawData);
+
+		res.statusCode = 302;
+		res.setHeader('Location', picture);
+		res.end();
+	      });
+	    });
+
+	  } catch (e) {
+	    console.log(e);
+	    res.end("Error:" + e);
+	  }
+
 	} else {
 	  res.statusCode = 404;
 	  res.end('Wrong link');			    
