@@ -48,10 +48,9 @@ const server = http.createServer((req, res) => {
 	      console.log(response);
 	      const { statusCode } = response;
 	      const contentType = response.headers['content-type'];
-	      let error;
 	      if (statusCode !== 200) {
-		error = new Error('Request Failed.\n' +
-				  `Status Code: ${statusCode}`);
+		throw new Error('Request Failed.\n' +
+				`Status Code: ${statusCode}.`);
 	      }
 	      let rawData = '';
 	      response.on('data', (chunk) => {
