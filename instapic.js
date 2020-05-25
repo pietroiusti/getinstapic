@@ -48,6 +48,7 @@ async function redirectUserToPic(pageUrl, res) {
     res.end();
   } catch(e) {
     console.log(e);
+    res.end("Error:" + e);
   }
 }
 
