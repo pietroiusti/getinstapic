@@ -1,9 +1,7 @@
 *  getinstapic
 Download pictures from Instagram
 
-A little exercise of web scraping using only pure Node.js
-
-https://secret-ocean-90372.herokuapp.com/
+A little exercise of web scraping using Node.js.
 
 ** license
 This program is free software: you can redistribute it and/or modify
