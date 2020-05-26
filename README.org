@@ -1,4 +1,4 @@
-*  getinstapic
+* getinstapic
 Download pictures from Instagram
 
 A little exercise of web scraping using Node.js.
